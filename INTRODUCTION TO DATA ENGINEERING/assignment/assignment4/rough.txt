@@ -1,0 +1,62 @@
+1) From home_data.csv, how many houses sold were built prior to 1979? (We promise that is the last time we’ll ask this question).  
+
+case class HomeData(id:BigInt,date:String,price:Integer,bedrooms:Integer,bathrooms:Double,sqft_living:Integer,sqft_lot:Integer,floors:Double,waterfront:Integer,view:Integer,condition:Integer,grade:Integer,sqft_above:Integer,sqft_basement:Integer,yr_built:Integer,yr_renovated:Integer,zipcode:Integer,latitude:Double,longitude:Double,sqft_living15:Integer,sqft_lot15:Integer)
+
+val home_data = spark.read.option("inferSchema", "true").option("header","true").csv("file:///root/home_data1.csv").as[HomeData]
+
+val build_prior_1979 = home_data.filter(_.yr_built < 1979)
+
+build_prior_1979.count
+
+Long = 11991
+
+
+
+ 
+2) From home_data.csv, what is the most expensive zipcode in the data set, defined as the zipcode having the highest average sales price?  
+
+case class HomeData(id:BigInt,date:String,price:Integer,bedrooms:Integer,bathrooms:Double,sqft_living:Integer,sqft_lot:Integer,floors:Double,waterfront:Integer,view:Integer,condition:Integer,grade:Integer,sqft_above:Integer,sqft_basement:Integer,yr_built:Integer,yr_renovated:Integer,zipcode:Integer,latitude:Double,longitude:Double,sqft_living15:Integer,sqft_lot15:Integer)
+
+val home_data1 = spark.read.option("inferSchema", "true").option("header","true").csv("file:///root/home_data1.csv").as[HomeData]
+
+val ExpensiveZipcode = home_data1.groupBy("zipcode").avg("price")
+
+ExpensiveZipcode.sort($"avg(price)".desc).show(1)
+
++-------+----------+
+|zipcode|avg(price)|
++-------+----------+
+|  98039| 2160606.6|
++-------+----------+
+ 
+3) How many unique zipcodes have sales data in the home_data.csv data set?  
+case class HomeData(id:BigInt,date:String,price:Integer,bedrooms:Integer,bathrooms:Double,sqft_living:Integer,sqft_lot:Integer,floors:Double,waterfront:Integer,view:Integer,condition:Integer,grade:Integer,sqft_above:Integer,sqft_basement:Integer,yr_built:Integer,yr_renovated:Integer,zipcode:Integer,latitude:Double,longitude:Double,sqft_living15:Integer,sqft_lot15:Integer)
+
+val home_data1 = spark.read.option("inferSchema", "true").option("header","true").csv("file:///root/home_data1.csv").as[HomeData]
+
+ val uniqueZipcode = home_data1.agg(countDistinct("zipcode"))
+ uniqueZipcode.show(1)
++-----------------------+
+|count(DISTINCT zipcode)|
++-----------------------+
+|                     70|
++-----------------------+
+
+ 
+4) Demonstrate how to drop the “sqft_living15” and “sqft_lot15” columns from your dataset.  
+case class HomeData(id:BigInt,date:String,price:Integer,bedrooms:Integer,bathrooms:Double,sqft_living:Integer,sqft_lot:Integer,floors:Double,waterfront:Integer,view:Integer,condition:Integer,grade:Integer,sqft_above:Integer,sqft_basement:Integer,yr_built:Integer,yr_renovated:Integer,zipcode:Integer,latitude:Double,longitude:Double,sqft_living15:Integer,sqft_lot15:Integer)
+
+val home_data1 = spark.read.option("inferSchema", "true").option("header","true").csv("file:///root/home_data1.csv").as[HomeData]
+ 
+val newDs = home_data1.drop("sqft_living15","sqft_lot15")
+ 
+5) Access the zipcode table stored in Hive (it’s ok to use a SQL String query here) and demonstrate joining that data with a DataFrame created from home_data.csv.  
+
+ case class HomeData(id:BigInt,date:String,price:Integer,bedrooms:Integer,bathrooms:Double,sqft_living:Integer,sqft_lot:Integer,floors:Double,waterfront:Integer,view:Integer,condition:Integer,grade:Integer,sqft_above:Integer,sqft_basement:Integer,yr_built:Integer,yr_renovated:Integer,zipcode:Integer,latitude:Double,longitude:Double,sqft_living15:Integer,sqft_lot15:Integer)
+val home_data = spark.read.option("inferSchema","true").option("header","true").csv("file:///root/home_data1.csv").as[HomeData]
+val hiveContext = new org.apache.spark.sql.hive.HiveContext(sc)
+val wa_zipcodes = hiveContext.table("wa_zipcodes")
+case class WaZipcode(zipcode:Int,city:String,state:String)
+val WaZipcodeDs = wa_zipcodes.as[WaZipcode]
+val joined = home_data.join(WaZipcodeDs,home_data("zipcode")=== WaZipcodeDs("zipcode"))
+joined.show(10)

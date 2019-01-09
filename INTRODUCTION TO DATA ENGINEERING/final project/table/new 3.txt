@@ -1,0 +1,25 @@
+1)	Maximum,minimum,mean,median,25th 75th percentiles of Donation column
+2)	Donation amount for each grade level category in top 5 states.
+3)	What are the top words and phrases used by Teachers in Essays----
+4)	Statewise donors chart.(number of dots on usa map) % of donor per state,city----
+SELECT COUNT(donor_id) as donor, donor_state FROM donors GROUP BY donor_state order by  donor DESC
+SELECT COUNT(donor_id) as donor, donor_state FROM donors GROUP BY donor_state having donor_state != "other" order by donor_state ASC
+5)	% of donor per state,city? -----
+6)	What time of year do we get max donations.
+7)	Which State receives Highest Average Donation Amounts
+8)	Cities with maximum school and type of school.
+9)	Most common item requested all the time.
+10)	Most expensive item requested from all the schools.
+11)	what are the most frequent Categories, SubCategories, and Resource Categories for posted projects ------
+12)	How does the ratio of Funded vs NonFunded project varies by State----------
+13)	Number of project which expired vs number of project funded. ------------
+
+
+
+4)
+select s1.donor_state, s1.donor, s2.population, (s1.donor/cast(translate(population, ",", "") as bigint))*100 as percentage from 
+(SELECT COUNT(donor_id) as donor, donor_state FROM donors GROUP BY donor_state having donor_state != "other" order by donor_state ASC) as s1
+join
+(Select state, population from statewise_population) as s2
+on s1.donor_state = s2.state
+order by percentage desc

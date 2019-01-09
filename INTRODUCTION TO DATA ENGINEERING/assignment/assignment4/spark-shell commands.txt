@@ -1,0 +1,68 @@
+
+coping local files to vm
+filezilla
+
+coping vm files to sandbox
+scp -P 2222 home_data1.csv root@localhost:
+~for home 
+
+
+
+-------------------------------------------------------
+val ds = spark.createDataset(1 to 199)
+ds.show(10)
+//slide 30
+
+-----------------------------------------------------
+val textRDD = sc.textFile("file:///data/war_and_peace.txt")
+import spark.implicits._
+val textDS = spark.read.textFile("file:///data/war_and_peace.txt")
+val lowerText = textDS.map(line => line.toLowerCase)
+val words = lowerText.flatMap(line => line.split("\\s+"))
+val groupedWords = words.groupByKey(x => x)
+groupedWords.count.show(10)
+
+-------------------------------------------------------------------------
+case class Airport (ident:String, category:String, name:String, latitude_deg:Double, longitude_deg:Double,elevation_ft:Integer, continent:String, iso_country:String, iso_region:String, municipality:String,gps_code:String, iata_code:String, local_code:String)
+val airports = spark.read.option("inferSchema", "true").option("header","true").csv("file:///root/airport_codes.csv").as[Airport]
+airports.show(5)
+
+----------------------------------------------
+ap1.iso_country
+ap2.latitude_deg
+
+val airportsCA = airports.filter(_.iso_region == "US-CA")
+airportsCA.count  ==========1016
+airports.count ============46235
+
+
+val heliports = airports.filter(_.iso_region == "US-CA").filter(_.category == "heliports").filter(_.elevation>1000)
+heliports.show(10);
+---------------------------------------------------------------
+DataFrames
+------------------------------------------------------------------
+
+val airportsDF = spark.read.options("inferSchema", “true”).option(“header”,"true").csv("file:///root/airport_codes.csv").as[Airport].toDF
+
+airportsDF.show(5)
+-----------------------------------------------------------------------------------------
+
+val airportsCA = .filter($"iso_region" === "US-CA") --------------> JUST REMEBER THE $ AND ===
+airportsCA.count=============== 1016
+----------------------------------------------------------------------------------------------------
+
+val otherAirportData = spark.read.json("root/airports.jsonl")
+otherAirportData.printSchema
+
+val joinedAirportData = airports.join(otherAirportData, airports("name") === otherAirportData("name")).select($"ident",airports("name"),$"tz")
+
+joinedAirportData.show(5)
+---------------------------------------------------------------------------------------------------------
+airportsDF.createOrReplaceTempView("airports")
+otherAirportData.createOrReplaceTempView("other_airports")
+spark.sql("select* from airports where iso_region = 'US-CA'").show(5)
+airportsDF
+
+
+
+

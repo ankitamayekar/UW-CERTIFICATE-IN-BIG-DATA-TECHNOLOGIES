@@ -1,0 +1,6 @@
+00:08:56	BIGDATA Host:	class starts now, happy halloween everyone
+00:55:05	Michael Ilyasov:	Hi Peter, could you please repeat the book name?
+00:58:08	Michael Ilyasov:	Thanks
+00:58:32	BIGDATA Host:	Joshua Bloch: Effective Java
+01:15:15	BIGDATA Host:	break, will resume in about 5 minutes
+01:29:41	BIGDATA Host:	class resumes
